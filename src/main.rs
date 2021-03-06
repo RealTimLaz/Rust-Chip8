@@ -33,8 +33,8 @@ fn main() {
     };
 
     let mut cpu = CPU::new();
-    let rom = include_bytes!("maze.ch8");
-    cpu.load_rom(rom);
+    //let rom = include_bytes!("maze.ch8");
+    //cpu.load_rom(rom);
 
     event_loop.run(move |event, _, control_flow| {
         if let Event::RedrawRequested(_) = event {
