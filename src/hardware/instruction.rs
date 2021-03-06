@@ -23,6 +23,12 @@ pub enum Instruction {
     JumpOffset(u16),
     Random(usize, u8),
     Draw(usize, usize, u8),
+    KeyEq(usize),
+    KeyNeq(usize),
+    GetDelay(usize),
+    WaitKey(usize),
+    SetDelay(usize),
+    SetSound(usize),
     IncAddress(usize),
     SpriteAddress(usize),
     RegDump(usize),
@@ -70,12 +76,21 @@ impl Instruction {
             (0xB, _, _, _) => Instruction::JumpOffset(address),
             (0xC, _, _, _) => Instruction::Random(x_register, value),
             (0xD, _, _, _) => Instruction::Draw(x_register, y_register, short_value),
+            (0xE, _, 0x9, 0xE) => Instruction::KeyEq(x_register),
+            (0xE, _, 0xA, 0x1) => Instruction::KeyNeq(x_register),
+            (0xF, _, 0x0, 0x7) => Instruction::GetDelay(x_register),
+            (0xF, _, 0x0, 0xA) => Instruction::WaitKey(x_register),
+            (0xF, _, 0x1, 0x5) => Instruction::SetDelay(x_register),
+            (0xF, _, 0x1, 0x8) => Instruction::SetSound(x_register),
             (0xF, _, 0x1, 0xE) => Instruction::IncAddress(x_register),
             (0xF, _, 0x2, 0x9) => Instruction::SpriteAddress(x_register),
             (0xF, _, 0x3, 0x3) => Instruction::BCD(x_register),
             (0xF, _, 0x5, 0x5) => Instruction::RegDump(x_register),
             (0xF, _, 0x6, 0x5) => Instruction::RegLoad(x_register),
-            _ => Instruction::NoOp,
+            _ => {
+                println!("Unknown Instruction: {:X}", opcode);
+                Instruction::NoOp
+            }
         }
     }
 }

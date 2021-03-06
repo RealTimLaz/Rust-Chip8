@@ -1,12 +1,14 @@
-use std::{env, fs::File, io::Read};
+use std::{env, fs::File, io::Read, thread::sleep, time::Duration};
 
+use hardware::{Keyboard, DISPLAY_HEIGHT, DISPLAY_WIDTH};
 use pixels::{Pixels, SurfaceTexture};
 use winit::{
     dpi::LogicalSize,
-    event::Event,
+    event::{Event, VirtualKeyCode},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
+use winit_input_helper::WinitInputHelper;
 
 mod hardware;
 
@@ -30,6 +32,7 @@ fn main() {
     let rom_data = read_rom_from_file(&rom_name);
 
     let event_loop = EventLoop::new();
+    let mut input = WinitInputHelper::new();
 
     let window = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
@@ -44,10 +47,11 @@ fn main() {
     let mut pixels = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-        Pixels::new(64, 33, surface_texture).unwrap()
+        Pixels::new(DISPLAY_WIDTH as u32, DISPLAY_HEIGHT as u32, surface_texture).unwrap()
     };
 
     let mut cpu = CPU::new();
+    let mut keyboard = Keyboard::new();
     cpu.load_rom(&rom_data);
 
     event_loop.run(move |event, _, control_flow| {
@@ -58,8 +62,24 @@ fn main() {
             }
         }
 
-        cpu.step(pixels.get_frame());
+        if input.update(&event) {
+            if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
+                *control_flow = ControlFlow::Exit;
+                return;
+            }
+
+            keyboard.handle_input(&input);
+
+            if let Some(size) = input.window_resized() {
+                pixels.resize(size.width, size.height)
+            }
+        }
+
+        cpu.step(pixels.get_frame(), &keyboard);
 
         window.request_redraw();
+
+        // Sleep at a rate that emulates about 500Hz. This won't be accurate.
+        //sleep(Duration::new(0, 2_000_000))
     });
 }
