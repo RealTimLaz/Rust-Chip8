@@ -1,3 +1,5 @@
+use std::{env, fs::File, io::Read};
+
 use pixels::{Pixels, SurfaceTexture};
 use winit::{
     dpi::LogicalSize,
@@ -13,7 +15,20 @@ use self::hardware::CPU;
 const WIDTH: u32 = 640;
 const HEIGHT: u32 = 320;
 
+fn read_rom_from_file(rom_name: &str) -> Vec<u8> {
+    let mut f =
+        File::open(rom_name).unwrap_or_else(|_| panic!("Unable to open file: {}", rom_name));
+    let mut rom = Vec::new();
+    f.read_to_end(&mut rom).expect("Unable to read rom");
+
+    rom
+}
+
 fn main() {
+    // Read ROM data
+    let rom_name = env::args().nth(1).expect("No file name given for ROM");
+    let rom_data = read_rom_from_file(&rom_name);
+
     let event_loop = EventLoop::new();
 
     let window = {
@@ -33,8 +48,7 @@ fn main() {
     };
 
     let mut cpu = CPU::new();
-    //let rom = include_bytes!("maze.ch8");
-    //cpu.load_rom(rom);
+    cpu.load_rom(&rom_data);
 
     event_loop.run(move |event, _, control_flow| {
         if let Event::RedrawRequested(_) = event {
