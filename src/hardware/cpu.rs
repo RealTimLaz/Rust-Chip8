@@ -233,17 +233,14 @@ impl CPU {
     }
 
     fn update_timers(&mut self) {
-        // let mut time_since_update = self.time_when_updated.elapsed().as_secs_f64();
-        // while time_since_update > HZ_60 {
-        //     time_since_update -= HZ_60;
-        //     self.delay_timer = self.delay_timer.saturating_sub(1);
-        //     self.sound_timer = self.sound_timer.saturating_sub(1);
-        // }
+        let mut time_since_update = self.time_when_updated.elapsed().as_secs_f64();
+        while time_since_update > HZ_60 {
+            time_since_update -= HZ_60;
+            self.delay_timer = self.delay_timer.saturating_sub(1);
+            self.sound_timer = self.sound_timer.saturating_sub(1);
+        }
 
-        // self.time_when_updated = Instant::now().sub(Duration::from_secs_f64(time_since_update));
-
-        self.delay_timer = self.delay_timer.saturating_sub(1);
-        self.sound_timer = self.sound_timer.saturating_sub(1);
+        self.time_when_updated = Instant::now() - Duration::from_secs_f64(time_since_update);
     }
 
     fn draw_display(&self, display: &mut [u8]) {

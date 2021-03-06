@@ -80,6 +80,6 @@ fn main() {
         window.request_redraw();
 
         // Sleep at a rate that emulates about 500Hz. This won't be accurate.
-        //sleep(Duration::new(0, 2_000_000))
+        sleep(Duration::new(0, 2_000_000))
     });
 }
