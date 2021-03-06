@@ -1,12 +1,10 @@
-use std::{
-    ops::Sub,
-    time::{Duration, Instant},
-};
+use std::time::{Duration, Instant};
 
 use super::instruction::Instruction;
 use super::{font::FONT, Keyboard};
 
 use rand::Rng;
+use rodio::Sink;
 
 const HZ_60: f64 = 1.0 / 60.0;
 pub const DISPLAY_HEIGHT: usize = 32;
@@ -21,11 +19,12 @@ pub struct CPU {
     stack: Vec<u16>,
     delay_timer: u8,
     sound_timer: u8,
+    beeper: Sink,
     time_when_updated: Instant,
 }
 
 impl CPU {
-    pub fn new() -> CPU {
+    pub fn new(beeper: Sink) -> CPU {
         let program_counter = 0x200;
 
         let mut memory = [0; 4096];
@@ -45,6 +44,7 @@ impl CPU {
             stack,
             delay_timer: 0,
             sound_timer: 0,
+            beeper,
             time_when_updated: Instant::now(),
         }
     }
@@ -200,6 +200,7 @@ impl CPU {
             Instruction::SetSound(reg) => {
                 self.sound_timer = self.registers[reg];
                 self.time_when_updated = Instant::now();
+                self.beeper.play();
             }
             Instruction::IncAddress(reg) => {
                 self.address_register += self.registers[reg] as u16;
@@ -238,6 +239,10 @@ impl CPU {
             time_since_update -= HZ_60;
             self.delay_timer = self.delay_timer.saturating_sub(1);
             self.sound_timer = self.sound_timer.saturating_sub(1);
+
+            if self.sound_timer == 0 {
+                self.beeper.pause();
+            }
         }
 
         self.time_when_updated = Instant::now() - Duration::from_secs_f64(time_since_update);
