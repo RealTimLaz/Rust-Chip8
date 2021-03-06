@@ -12,13 +12,13 @@ impl Keyboard {
         Keyboard { state }
     }
 
-    pub fn any_key_pressed(&self) -> u8 {
+    pub fn any_key_pressed(&self) -> Option<u8> {
         for (i, key) in self.state.iter().enumerate() {
             if *key {
-                return i as u8;
+                return Some(i as u8);
             }
         }
-        255
+        None
     }
 
     pub fn handle_input(&mut self, input: &WinitInputHelper) {

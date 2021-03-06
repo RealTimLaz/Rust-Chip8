@@ -188,10 +188,10 @@ impl CPU {
             }
             Instruction::WaitKey(reg) => {
                 let key = keyboard.any_key_pressed();
-                if key == 0xFF {
-                    self.program_counter -= 2;
-                }
-                self.registers[reg] = key;
+                match key {
+                    Some(k) => self.registers[reg] = k,
+                    None => self.program_counter -= 2,
+                };
             }
             Instruction::SetDelay(reg) => {
                 self.delay_timer = self.registers[reg];
