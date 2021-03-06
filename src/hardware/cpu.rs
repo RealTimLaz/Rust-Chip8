@@ -271,14 +271,6 @@ impl CPU {
         // Decode instruction to enum
         let decoded_instr = Instruction::decode(raw_instr);
 
-        // println!(
-        //     "PC: {:3X} {:X?} I: {:X} Registers: {:X?}",
-        //     self.program_counter - 2,
-        //     decoded_instr,
-        //     self.address_register,
-        //     self.registers
-        // );
-
         // Execute instruction
         self.execute(decoded_instr, keyboard);
 
