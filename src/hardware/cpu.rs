@@ -204,18 +204,6 @@ impl CPU {
 
                 let val = val / 10;
                 self.memory[self.address_register as usize] = val % 10;
-
-                let mem = &self.memory[((self.address_register - 4) as usize)
-                    ..((self.address_register + 5) as usize)];
-
-                // println!(
-                //     "Value is {}: {},{},{} {:?}",
-                //     self.registers[reg],
-                //     self.memory[self.address_register as usize],
-                //     self.memory[(self.address_register + 1) as usize],
-                //     self.memory[(self.address_register + 2) as usize],
-                //     mem
-                // );
             }
 
             _ => (),
@@ -233,17 +221,6 @@ impl CPU {
 
         // Decode instruction to enum
         let decoded_instr = Instruction::decode(raw_instr);
-        if let Instruction::Jump(0x3DC) = decoded_instr {
-            let foo = 0;
-        } else {
-            // println!(
-            //     "PC: {:X}: {:X?} I: {:X}, registers: {:X?}",
-            //     self.program_counter - 2,
-            //     decoded_instr,
-            //     self.address_register,
-            //     self.registers
-            // );
-        }
 
         // Execute instruction
         self.execute(decoded_instr, display);

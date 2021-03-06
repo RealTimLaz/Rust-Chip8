@@ -29,11 +29,11 @@ fn main() {
     let mut pixels = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-        Pixels::new(64, 32, surface_texture).unwrap()
+        Pixels::new(64, 33, surface_texture).unwrap()
     };
 
     let mut cpu = CPU::new();
-    let rom = include_bytes!("c8_test.ch8");
+    let rom = include_bytes!("maze.ch8");
     cpu.load_rom(rom);
 
     event_loop.run(move |event, _, control_flow| {
